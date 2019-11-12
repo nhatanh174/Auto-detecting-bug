@@ -1,4 +1,4 @@
-
+import csv
 from gensim.models import Doc2Vec
 from nltk import sent_tokenize,word_tokenize
 import numpy as np
@@ -10,7 +10,7 @@ from keras.layers import Conv1D, MaxPooling1D,Input,Embedding
 def Start():
     file = pd.read_csv('Training_Test\AspectJ_process.csv')
     data = file['description'].values
-    print(data)
+
     # Find the maximum number (nS) of sentences from each bug report
     def max_sentence(data):
         max = 0
@@ -29,6 +29,8 @@ def Start():
     max_sent = max_sentence(data)
     model = Doc2Vec.load('Doc2vec.model')
     feature_vector = []  # save feature vectors in bug reports
+    #---------------------------------------------------------------
+
     for row in data:
         if (type(row) == str):
             sent = sent_tokenize(row)
@@ -62,8 +64,8 @@ def Start():
                 dem += 1
             arr = arr.reshape(1, 300)
             feature_vector.append(arr)
+    return feature_vector   # trả về các vector đặc trưng đối vời từng bug report
     # for i in feature_vector:
     #     print(i)
-
 
 
