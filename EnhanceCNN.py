@@ -7,12 +7,12 @@ from keras import backend as K
 
 def action():
     # enhance CNN with label(bug, notbug) and (r,f)
-    def custom_loss(y_true, y_pred, r, f):
-        return -K.mean(y_true * K.log(y_pred) + (1 - y_true) * K.log(1 - y_pred) - r - f)
+    def custom_loss(y_true, y_pred, w1r, w2f):
+        return -K.mean(y_true * K.log(y_pred) + (1 - y_true) * K.log(1 - y_pred) - w1r - w2f)
 
-    def enhance_loss(r, f):
+    def enhance_loss(w1r, w2f):
         def loss(y_true, y_pred):
-            return custom_loss(y_true, y_pred, r, f)
+            return custom_loss(y_true, y_pred, w1r, w2f)
 
         return loss
 
@@ -47,6 +47,8 @@ def action():
 
     # compute w1,w2
     def compute_w1_w2(r, f):
+        w1r=[]
+        w2f=[]
         w1 = []
         w2 = []
         w_init = np.random.normal(size=2)
@@ -55,11 +57,19 @@ def action():
         for i in range(1, len(r)):
             w1.append(w1[i - 1] - 0.001 * r[i - 1])
             w2.append(w2[i - 1] - 0.001 * f[i - 1])
-        return w1, w2
+        for i in range(0,len(r)):
+            w1r.append(w1[i]*r[i])
+            w2f.append(w2[i]*f[i])
+        return w1r, w2f
 
     def enhance_CNN():
 
         r,f = returnRiFi()
+        w1r,w2f= compute_w1_w2(r,f)
+        w1r=np.reshape(w1r,(r.shape[0],1))
+        w2f=np.reshape(w2f,(r.shape[0],1))
+        w1r=np.asarray(w1r)
+        w2f=np.asarray(w2f)
         count = len(r)
         label = returnLabel(count)
         model_CNN = Sequential()
@@ -68,6 +78,5 @@ def action():
         model_CNN.add(MaxPooling2D(pool_size=(1, 2)))
         model_CNN.add(Flatten())
         model_CNN.add(Dense(1, activation='softmax'))
-        model_CNN.summary()
-        model_CNN.compile(optimizer='adam', loss=enhance_loss(r, f), metrics=['accuracy'])
-        model_CNN.fit(input_vt, label, epochs=100, batch_size=1, validation_data=(x_test, y_test))
+        model_CNN.compile(optimizer='adam', loss=enhance_loss(w1r, w2f), metrics=['accuracy'])
+        model_CNN.fit(input_vt, label, epochs=100, batch_size=1, validation_data=(x_val, y_val))
