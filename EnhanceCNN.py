@@ -7,12 +7,12 @@ from keras import backend as K
 
 def action():
     # enhance CNN with label(bug, notbug) and (r,f)
-    def custom_loss(y_true, y_pred, r, f):
-        return -K.mean(y_true * K.log(y_pred) + (1 - y_true) * K.log(1 - y_pred) - r - f)
+    def custom_loss(y_true, y_pred, r, f,w1,w2):
+        return -K.mean(y_true * K.log(y_pred) + (1 - y_true) * K.log(1 - y_pred) - w1*r - w2*f)
 
-    def enhance_loss(r, f):
+    def enhance_loss(w1,w2,r, f):
         def loss(y_true, y_pred):
-            return custom_loss(y_true, y_pred, r, f)
+            return custom_loss(y_true, y_pred, r, f,w1,w2)
 
         return loss
 
@@ -60,6 +60,7 @@ def action():
     def enhance_CNN():
 
         r,f = returnRiFi()
+        w1,w2= compute_w1_w2(r,f)
         count = len(r)
         label = returnLabel(count)
         model_CNN = Sequential()
@@ -68,6 +69,5 @@ def action():
         model_CNN.add(MaxPooling2D(pool_size=(1, 2)))
         model_CNN.add(Flatten())
         model_CNN.add(Dense(1, activation='softmax'))
-        model_CNN.summary()
-        model_CNN.compile(optimizer='adam', loss=enhance_loss(r, f), metrics=['accuracy'])
+        model_CNN.compile(optimizer='adam', loss=enhance_loss(w1,w2,r, f), metrics=['accuracy'])
         model_CNN.fit(input_vt, label, epochs=100, batch_size=1, validation_data=(x_test, y_test))
