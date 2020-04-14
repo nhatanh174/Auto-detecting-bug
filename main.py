@@ -1,93 +1,61 @@
 import pandas as pd
-import Data_preprocessing as pre_bug
-import Bug_report_processed as brp
-import Extract_feature_vector as efv
 import numpy as np
+import Bug_data_processing as bdp
+import Bug_word_embedding as bwe
+import Extract_feature_bug as efb
 
-#for source file
-import File as file
-import Data_processing as pre_sour   #process source
-import Extract_vecto as ex_vec
-import model_CNN
-import Word2vec_source as w2vs
-
-import Cosine_similarity as cs
-import LabelEqual1 as le
-from sklearn.model_selection import train_test_split
-
-#------------------------------bug report-----------------------------------
-
-df = pd.read_csv('Training_Test\AspectJ.txt', sep="\t")
-df.to_csv('Training_Test\AspectJ_csv.csv', index=False)
+# # for source file
+# from sklearn.model_selection import train_test_split
+# import Source_data_processing as sdp
+# import Source_word2vec
+# import Source_tfidf
+# import Extract_feature_source
+#
+# # setup input for enhance
+# import Label_equal0 as le0
+# import Label_equal1 as le1
+# import Get_date_frequence as gt
+# import EnhanceCNN
 
 
 
-# split into training set, validation set, test set
-inp = pd.read_csv("Training_Test\AspectJ_csv.csv")
-x= inp[['id', 'bug_id', 'summary', 'description', 'report_time', 'report_timestamp', 'status', 'commit', 'commit_timestamp', 'files', 'Unnamed: 10']].values
+# ---------------for source file--------------
+# srs = sdp.preprocess_sourcefile()
+#
+# Source_word2vec.start(srs)
+# # compute tf_idf
+# tf_idf=Source_tfidf.computeTf_Idf(srs)
+# # extract vector with CNN
+# extractSource = Extract_feature_source.sourcefile_extractvector(srs,tf_idf)
 
-y=np.arange(len(x))
-columns = "id bug_id summary description report_time report_timestamp status commit commit_timestamp files Unnamed:10".split()
-X_train, X_test, y_train, y_test = train_test_split(x,y,test_size=0.2)
-df =pd.DataFrame(X_train,columns=columns)
-df.to_csv("Training_Test\AspectJ_csv_trainingset.csv")
-#-----------------------------------------------------------------------------------------------
+# ------------------------------bug report-----------------------------------
+# Convert txt to csv in order to select column data which we need to use
+df = pd.read_csv('TestData\Eclipse_Platform_UI.txt', sep="\t")
+df.to_csv('TestData\Eclipse_Platform_UI_csv.csv', index=False)
 
 # Read file csv and Extract summary and description
-inp = pd.read_csv('Training_Test\AspectJ_csv_trainingset.csv')
+inp = pd.read_csv('TestData\Eclipse_Platform_UI_csv.csv')
 x= inp[['summary','description']]
 
-df =pd.DataFrame(x)
+# Data pre-processing
+bdp.Start(x)
 
-df.to_csv('Training_Test\AspectJ_process.csv')
+# Word_Embedding
+matrixBug = bwe.MatrixOfBugReport()
 
-#Data pre-processing
-pre_bug.Start()
+# Extract feature vector
+matrixs, maxSent = bwe.MatrixOfBugReport()
+extractBug = efb.ExtractVector(matrixs,maxSent)
 
-#Word_Embedding
-brp.word_embedding()
-
-#Extract feature vector
-vecto_detect_bug = efv.Start()
-print(vecto_detect_bug)
-
-#---------------for source file--------------
-
-
-path= r"E:\Pycharm projects\Auto_detect_bug\Training_Test\sourceFile_aspectj"
-
-files=[]        # list name file.java
-file.openFolder(path,files,'*.java')
-# list sourfile
-corpus=[]
-for file in files:
-    corpus.append(pre_sour.pre_processing(file))
-corpus_2d=[]
-for file in corpus:
-    for sent in file:
-        corpus_2d.append(sent)
-
-#word2vec
-w2vs.start(corpus_2d)
-
-# list matrix of sourfiles
-number_line=[]
-for sourcefile in corpus:
-    number_line.append(len(sourcefile))
-line_max= max(number_line)
-matrix=[]
-for sourcefile in corpus:
-    vecto=np.zeros(shape=(line_max,300))
-    for i in range(len(sourcefile)):
-        vecto[i]= ex_vec.CombineVector(sourcefile[i],corpus)
-    matrix.append(vecto)
-#matrix là list các ma trận của các source file
-#list vecto feature
-vecto_detect_source=model_CNN.feature_detect(matrix)
-
-(ri_max1, fi_max1) = cs.computeCosine(vecto_detect_bug,vecto_detect_source)
-(ri_max2, fi_max2) = le.labelEqual1(vecto_detect_bug,vecto_detect_source)
-ri_max = max(ri_max1,ri_max2)
-fi_max = max(fi_max1, fi_max2)
-
-#-------------------------------------------enhanceCNN---------------------------------------
+# # -------------------------------------------enhanceCNN---------------------------------------
+# # input for enhance
+# (ri_max1, fi_max1, ri_min1, fi_min1) = le1.labelEqual1(extractBug, extractSource)
+# (ri_max2, fi_max2, ri_min2, fi_min2) = le0.computeCosine(extractBug, extractSource)
+# r_max = max(ri_max1, ri_max2)
+# f_max = max(fi_max1, fi_max2)
+# r_min = min(ri_min1, ri_min2)
+# f_min = min(fi_min1, fi_min2)
+# gt.computeRiAndFi(r_max, f_max, r_min, f_min)
+#
+# # enhance CNN
+# EnhanceCNN.enhance_CNN()
