@@ -6,6 +6,14 @@ from nltk.tokenize import word_tokenize
 import nltk
 nltk.download('punkt')
 #xu ly word cu phap vd: anhNguyenNhat -> anh nguyen nhat
+
+# Define constance
+BUG="TestData\Eclipse_Platform_UI.txt"
+BUG_CSV ="TestData\Eclipse_Platform_UI_csv.csv"
+BUG_PROCESS = "TestData\Eclipse_Platform_UI_process.csv"
+SOURCE = "TestData/SourceFile/sourceFile_eclipseUI"
+
+
 def process_word(word):
 
   char = []
@@ -27,7 +35,7 @@ def openFolder(path, files, agr):
 def preprocess_sourcefile():
     name_files=[]
     srs=[]
-    openFolder(r"TestData/SourceFile/sourceFile_aspectj",name_files,"*.java")
+    openFolder(SOURCE,name_files,"*.java")
 
     for name_file in name_files:
         source_code=[]
@@ -66,4 +74,4 @@ def preprocess_sourcefile():
             srs.append(source_code)
     return srs
 
-preprocess_sourcefile()
+#preprocess_sourcefile()

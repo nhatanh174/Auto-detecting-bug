@@ -4,11 +4,15 @@ import os
 import numpy as np
 from datetime import datetime
 
-
+# Define constance
+BUG="TestData\Eclipse_Platform_UI.txt"
+BUG_CSV ="TestData\Eclipse_Platform_UI_csv.csv"
+BUG_PROCESS = "TestData\Eclipse_Platform_UI_process.csv"
+SOURCE = "TestData/SourceFile/sourceFile_eclipseUI"
 
 # get the list of file source name
 def getListName():
-    path_source = "TestData/SourceFile/sourceFile_aspectj"
+    path_source = SOURCE
     files = []  # list name file.java
     File.openFolder(path_source, files, '*.java')
     ds = File.getName(files)
@@ -20,12 +24,12 @@ def getListName():
 def divide_link(input):
     output = []
     link = ''
-    for i in input:
-        if (i != ' '):
-            link += i
-        else:
+    for i in range(len(input)):
+        if input[i] == ' ' and input[i - 5:i] == ".java":
             output.append(link)
             link = ''
+        else:
+            link += input[i]
     output.append(link)
     return output
 
@@ -43,7 +47,7 @@ def listFileInBug(link,id):
 
 # get list of the date of bug
 def getListDateBug():
-    path_bug = "TestData/AspectJ_csv.csv"
+    path_bug = BUG_CSV
     file = pd.read_csv(path_bug)
     des = file['description']
     date = file['report_timestamp']
@@ -57,7 +61,7 @@ def getListDateBug():
 
 #get list of the date of file
 def getListDateSource():
-    file = pd.read_csv('TestData/AspectJ_csv.csv')
+    file = pd.read_csv(BUG_CSV)
     data_des=file['description'].values
     id = file['commit'].values
     data_time = file['commit_timestamp'].values
@@ -171,4 +175,5 @@ def computeRiAndFi(rMax, fMax,rMin, fMin):
     file['Ri'] = ri
     file['Fi'] = fi
     file.to_csv('TestData/InputForEnhanceCNN_label1.csv')
+
 

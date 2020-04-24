@@ -5,6 +5,11 @@ import re
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from nltk import sent_tokenize
 
+# Define constance
+BUG="TestData\Eclipse_Platform_UI.txt"
+BUG_CSV ="TestData\Eclipse_Platform_UI_csv.csv"
+BUG_PROCESS = "TestData\Eclipse_Platform_UI_process.csv"
+
 # buil model word2vec for summary in bug reports
 def splitData(data):
     x=[]
@@ -33,7 +38,7 @@ def desDoc2vec():
     def tokenize_corpus(corpus):
         tokens = [x.split() for x in corpus]
         return tokens
-    file = pd.read_csv('TestData\Eclipse_Platform_UI_process.csv')
+    file = pd.read_csv(BUG_PROCESS)
     data = file['description'].values
     data = re.sub(r'\d', ' ', str(data))
     corpus = sent_tokenize(data)
@@ -46,7 +51,7 @@ def desDoc2vec():
     model.train(sentences, total_examples=model.corpus_count, epochs=100)
     model.save('Doc2vec.model')
     del model
-file = pd.read_csv('TestData\Eclipse_Platform_UI_process.csv')
+file = pd.read_csv(BUG_PROCESS)
 data = file['summary'].values
 data = splitData(data)
 bugWord2vec(data)

@@ -3,6 +3,11 @@ from nltk.stem import PorterStemmer
 import pandas as pd
 import re
 
+# Define constance
+BUG="TestData\Eclipse_Platform_UI.txt"
+BUG_CSV ="TestData\Eclipse_Platform_UI_csv.csv"
+BUG_PROCESS = "TestData\Eclipse_Platform_UI_process.csv"
+
 def Start(data):
     inp = data
 
@@ -107,4 +112,4 @@ def Start(data):
 
     x = pd.DataFrame({'summary': text1_save, 'description': text2_save})
     # inp['description'] = text_save
-    x.to_csv('TestData\Eclipse_Platform_UI_process.csv')
+    x.to_csv(BUG_CSV)

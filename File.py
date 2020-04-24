@@ -3,6 +3,12 @@ import glob
 import datetime
 import ntpath
 
+# Define constance
+BUG="TestData\Eclipse_Platform_UI.txt"
+BUG_CSV ="TestData\Eclipse_Platform_UI_csv.csv"
+BUG_PROCESS = "TestData\Eclipse_Platform_UI_process.csv"
+SOURCE = "TestData/SourceFile/sourceFile_eclipseUI"
+
 # function read folder
 def openFolder(path, files, agr):
     files.extend(glob.glob(os.path.join(path, agr)))
@@ -20,3 +26,5 @@ def getName(files):
     for i in range(0,len(files)):
         files[i]=ntpath.basename(files[i])
     return files
+
+

@@ -4,6 +4,11 @@ import pandas as pd
 import numpy as np
 from nltk import sent_tokenize,word_tokenize
 
+# Define constance
+BUG="TestData\Eclipse_Platform_UI.txt"
+BUG_CSV ="TestData\Eclipse_Platform_UI_csv.csv"
+BUG_PROCESS = "TestData\Eclipse_Platform_UI_process.csv"
+
 def MatrixOfBugReport():
     # compute the max sentences in description
     def max_sentence(data):
@@ -57,7 +62,7 @@ def MatrixOfBugReport():
                 vector = np.zeros(shape=(maxSent,k))
                 result.append(vector)
         return np.asarray(result)
-    inp = pd.read_csv('TestData\Eclipse_Platform_UI_process.csv')
+    inp = pd.read_csv(BUG_PROCESS)
     summary = inp['summary'].values
     text = inputW2v(summary)
     summaryMatrix = forSummary(text)
@@ -70,10 +75,8 @@ def MatrixOfBugReport():
     for i in range(len(summaryMatrix)):
         bugMatrix.append(np.concatenate((summaryMatrix[i], descriptionMatrix[i])))
 
-    print(len(bugMatrix))
-    for i in bugMatrix:
-        print(len(i))
+    print(len(bugMatrix),len(bugMatrix[1]),"ok")
     bugMatrix=np.asarray(bugMatrix)
     return  bugMatrix, maxSent+1
-MatrixOfBugReport()
+
 

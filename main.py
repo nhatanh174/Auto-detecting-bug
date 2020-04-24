@@ -4,6 +4,11 @@ import Bug_data_processing as bdp
 import Bug_word_embedding as bwe
 import Extract_feature_bug as efb
 
+# Define constance
+BUG="TestData\Eclipse_Platform_UI.txt"
+BUG_CSV ="TestData\Eclipse_Platform_UI_csv.csv"
+BUG_PROCESS = "TestData\Eclipse_Platform_UI_process.csv"
+
 # # for source file
 # from sklearn.model_selection import train_test_split
 # import Source_data_processing as sdp
@@ -30,18 +35,17 @@ import Extract_feature_bug as efb
 
 # ------------------------------bug report-----------------------------------
 # Convert txt to csv in order to select column data which we need to use
-df = pd.read_csv('TestData\Eclipse_Platform_UI.txt', sep="\t")
-df.to_csv('TestData\Eclipse_Platform_UI_csv.csv', index=False)
+df = pd.read_csv(BUG, sep="\t")
+df.to_csv(BUG_CSV, index=False)
 
 # Read file csv and Extract summary and description
-inp = pd.read_csv('TestData\Eclipse_Platform_UI_csv.csv')
+inp = pd.read_csv(BUG_CSV)
 x= inp[['summary','description']]
 
 # Data pre-processing
 bdp.Start(x)
 
-# Word_Embedding
-matrixBug = bwe.MatrixOfBugReport()
+
 
 # Extract feature vector
 matrixs, maxSent = bwe.MatrixOfBugReport()

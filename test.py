@@ -1,61 +1,113 @@
 import pandas as pd
-import numpy as np
-import  pickle
-import re
-import Bug_data_processing as bdp
-import Bug_word_embedding as bwe
-import Extract_feature_bug as efb
-
-# for source file
-from sklearn.model_selection import train_test_split
-import Source_data_processing as sdp
-import Source_word2vec
-import Source_tfidf
-import Extract_feature_source
-
-# setup input for enhance
-import Label_equal0 as le0
-import Label_equal1 as le1
 import Get_date_frequence as gt
-import EnhanceCNN
+import File
+import os
+import glob
+import ntpath
 
-def to_matrix(input, shape1, shape2):
-    matrix = np.zeros(shape=(shape1, shape2))
-    mtrx = re.sub("\[", ' ', input)
-    mtrx = re.sub("]", ' ', mtrx)
-    mtrx = mtrx.split()
-    count_col = 0
-    count_row = 0
-    for i in mtrx:
-        j = float(i)
-        if (count_col < shape2):
-            matrix[count_row][count_col] = j
-        if (count_col == shape2) and (count_row < shape1):
-            count_col = 0
-            count_row += 1
-            matrix[count_row][count_col] = j
-        count_col += 1
-    return matrix.tolist()
+# Define constance
+BUG="TestData\Eclipse_Platform_UI.txt"
+BUG_CSV ="TestData\Eclipse_Platform_UI_csv.csv"
+BUG_PROCESS = "TestData\Eclipse_Platform_UI_process.csv"
+SOURCE = "TestData/SourceFile/sourceFile_eclipseUI"
 
-pickle_input = open("TestData/Bug_extract_feature.pickle", "rb")
-listt = pickle.load(pickle_input)
-pickle_input.close()
+# xử lý link trong cột file, lấy ra tên file
+def divide_link(input):
+    output = []
+    link = ''
+    # for i in input:
+    #     if (i != ' '):
+    #         link += i
+    #     else:
+    #         output.append(link)
+    #         link = ''
+    # output.append(link)
+    for i in range(len(input)):
+        if input[i]==' ' and input[i-5:i]==".java":
+            output.append(link)
+            link=''
+        else:
+            link+=input[i]
+    output.append(link)
+    return output
 
-extractBug = np.asarray(listt)
-#----------------------------
-file = pd.read_csv('TestData/Sourcefiles.csv')
-x = file['source_file'].values
-vector =[]
-for i in x:
-    mn = to_matrix(i, 1, 300)
-    vector.append(mn)
-extractSource = np.asarray(vector)
+def clean(link, id):  # add id , return then id+name file java
+    path = os.path.normpath(link)
+    token = path.split(os.sep)
+    return (id + ' ' + token[len(token) - 1])
 
-(ri_max1, fi_max1, ri_min1, fi_min1) = le1.labelEqual1(extractBug, extractSource)
-(ri_max2, fi_max2, ri_min2, fi_min2) = le0.computeCosine(extractBug, extractSource)
-r_max = max(ri_max1, ri_max2)
-f_max = max(fi_max1, fi_max2)
-r_min = min(ri_min1, ri_min2)
-f_min = min(fi_min1, fi_min2)
-gt.computeRiAndFi(r_max, f_max, r_min, f_min)
+def listFileInBug(link,id):
+    s=[]
+    list_link = divide_link(link)
+    for i in list_link:
+        s.append(clean(i,id))
+    return s
+
+def openFolder(path, files, agr):
+    files.extend(glob.glob(os.path.join(path, agr)))
+    for file in os.listdir(path):
+        fullpath = os.path.join(path, file)
+        if os.path.isdir(fullpath) and not os.path.islink(fullpath):
+            openFolder(fullpath,files,agr)
+
+def getName(files):
+    for i in range(0,len(files)):
+        files[i]=ntpath.basename(files[i])
+    return files
+
+file = pd.read_csv(BUG_CSV)
+data_des = file['description'].values
+id = file['commit'].values
+data_time = file['commit_timestamp'].values
+data_file1 = file['files'].values
+data_file2 = file['Unnamed: 10'].values
+n = len(data_des)
+count=0
+re=[]
+while (count < n):
+    s = listFileInBug(data_file1[count], id[count])
+    for i in s:
+        re.append(i)
+    if (type(data_file2[count]) == str):
+        r = listFileInBug(data_file2[count], id[count])
+        for i in r:
+            re.append(i)
+    count+=1
+
+# for i in re:
+#     print(i)
+print(len(re))
+
+name_files=[]
+openFolder(SOURCE,name_files,"*.java")
+file = getName(name_files)
+
+print(len(name_files))
+sourceFileBug =[]
+for i in re:
+    kt=0
+    for j in file:
+        if (i==j):
+            kt=1
+            break
+    if kt==1:
+        sourceFileBug.append(i)
+print(len(sourceFileBug))
+dem=0
+for i in file:
+    kt=0
+    for j in re:
+        if (i==j):
+            kt=1
+            break
+    if kt==0:
+        print(i)
+        dem+=1
+print(dem)
+# link="abc/aa aaaaaa.java.io/aa/ok.java"
+# path = os.path.normpath(link)
+# token = path.split(os.sep)
+# for i in token:
+#     print(i)
+
 
