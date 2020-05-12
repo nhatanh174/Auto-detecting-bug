@@ -112,4 +112,4 @@ def Start(data):
 
     x = pd.DataFrame({'summary': text1_save, 'description': text2_save})
     # inp['description'] = text_save
-    x.to_csv(BUG_CSV)
+    x.to_csv(BUG_PROCESS)

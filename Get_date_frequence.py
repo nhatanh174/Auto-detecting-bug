@@ -1,5 +1,6 @@
 import File
 import pandas as pd
+import pickle
 import os
 import numpy as np
 from datetime import datetime
@@ -11,11 +12,18 @@ BUG_PROCESS = "TestData\Eclipse_Platform_UI_process.csv"
 SOURCE = "TestData/SourceFile/sourceFile_eclipseUI"
 
 # get the list of file source name
-def getListName():
-    path_source = SOURCE
-    files = []  # list name file.java
-    File.openFolder(path_source, files, '*.java')
-    ds = File.getName(files)
+# def getListName():
+#     path_source = SOURCE
+#     files = []  # list name file.java
+#     File.openFolder(path_source, files, '*.java')
+#     ds = File.getName(files)
+#     return ds
+
+def getListName():  #because have some problem with source when processing
+    pickle_input = open("TestData/new_namesource.pickle", "rb")
+    listt = pickle.load(pickle_input)
+    pickle_input.close()
+    ds = File.getName(listt)
     return ds
 
 
@@ -66,7 +74,7 @@ def getListDateSource():
     id = file['commit'].values
     data_time = file['commit_timestamp'].values
     data_file1 = file['files'].values
-    data_file2 = file['Unnamed:10'].values
+    data_file2 = file['Unnamed: 10'].values
     n= len(data_des)
     listName=getListName()
     m=len(listName)
@@ -74,11 +82,31 @@ def getListDateSource():
     listDate = np.zeros(m)
     while count<n:
         s = listFileInBug(data_file1[count],id[count])
+        s1 = []
+        for i in s:
+            kt = 0
+            for j in listName:
+                if (i == j):
+                    kt = 1
+                    break
+            if kt == 1:
+                s1.append(i)  # loai tru cac file k can thiet ma tac gia da xoa di
+        s = s1
         for i in s:
             ind = listName.index(i)
             listDate[ind]=data_time[count]
         if (type(data_file2[count])==str):
             r = listFileInBug(data_file2[count], id[count])
+            r1 = []
+            for i in r:
+                kt = 0
+                for j in listName:
+                    if (i == j):
+                        kt = 1
+                        break
+                if kt == 1:
+                    r1.append(i)  # loai tru cac file k can thiet ma tac gia da xoa di
+            r = r1
             for i in r:
                 ind = listName.index(i)
                 listDate[ind] = data_time[count]

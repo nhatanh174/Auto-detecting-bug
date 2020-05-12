@@ -1,6 +1,7 @@
 import  numpy as np
 import math
 import csv
+import pickle
 import Get_date_frequence as gt
 import pandas as pd
 
@@ -35,6 +36,7 @@ def concatenate(a, b):
 
 
 # -------------------------------------
+
 
 def computeCosine(bugVectors, sourceVectors):
 

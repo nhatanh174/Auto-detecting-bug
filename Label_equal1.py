@@ -2,7 +2,7 @@ import pandas as pd
 import Get_date_frequence as gt
 import numpy as np
 import csv
-
+import pickle
 import re
 
 # Define constance
@@ -16,6 +16,7 @@ def concatenate(a, b):
     x[0] = a
     x[1] = b
     return x
+
 
 
 def labelEqual1(bugVectors, sourceVectors):
