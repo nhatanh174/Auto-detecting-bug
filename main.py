@@ -78,15 +78,22 @@ pickle_input = open("TestData/Bug_extract_feature.txt", "rb")
 listt = pickle.load(pickle_input)
 pickle_input.close()
 
-extractBug = np.asarray(listt)
+matrixBug = np.asarray(listt)
+vectorBug=[]
+for matrix in matrixBug:
+    vectorBug.append(np.mean(matrix))
 #----------------------------
 pickle_input = open("TestData/new_vectorsource.pickle", "rb")
 listt = pickle.load(pickle_input)
 pickle_input.close()
-extractSource = np.asarray(listt)
+matrixSource = np.asarray(listt)
+vectorSource=[]
+for vector in vectorSource:
+    vectorSource.append(np.mean(vector))
+
 # input for enhance
-(ri_max1, fi_max1, ri_min1, fi_min1) = le1.labelEqual1(extractBug, extractSource)
-(ri_max2, fi_max2, ri_min2, fi_min2) = le0.computeCosine(extractBug, extractSource)
+(ri_max1, fi_max1, ri_min1, fi_min1) = le1.labelEqual1(matrixBug, matrixSource,vectorBug,vectorSource)
+(ri_max2, fi_max2, ri_min2, fi_min2) = le0.computeCosine(matrixBug, matrixSource,vectorBug,vectorSource)
 r_max = max(ri_max1, ri_max2)
 f_max = max(fi_max1, fi_max2)                                      
 r_min = min(ri_min1, ri_min2)
