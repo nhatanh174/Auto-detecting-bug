@@ -19,7 +19,7 @@ def concatenate(a, b):
 
 
 
-def labelEqual1(bugVectors, sourceVectors):
+def labelEqual1(bugVectors, sourceVectors,matrixBug,matrixSource):
     listName = gt.getListName()
     time_bug = gt.getListDateBug()
     time_source = gt.getListDateSource()
@@ -35,7 +35,7 @@ def labelEqual1(bugVectors, sourceVectors):
     fi_min = 1000000
 
     with open('TestData/InputForEnhanceCNN_label1.csv','w') as csv_file:
-        fieldnames = ['input_vector','label','Ri','Fi']     #Định dạng cột
+        fieldnames = ['matrixBug','matrixSource','label','Ri','Fi']     #Định dạng cột
         writer = csv.DictWriter(csv_file,fieldnames=fieldnames)
         writer.writeheader()
         m= len(bugVectors)
@@ -56,9 +56,10 @@ def labelEqual1(bugVectors, sourceVectors):
             s=s1
             for i in s:
                 ind = listName.index(i)
-                concate_vector = concatenate(bugVectors[count_bug],sourceVectors[ind])
+                # concate_vector = concatenate(bugVectors[count_bug],sourceVectors[ind])
                 ri, fi = gt.computeR_F(time_bug[count_bug], time_source, listName[ind], listName)
-                writer.writerow({'input_vector':concate_vector, 'label':1, 'Ri':ri, 'Fi':fi}) #viết theo từng hàng
+                # writer.writerow({'input_vector':concate_vector, 'label':1, 'Ri':ri, 'Fi':fi}) #viết theo từng hàng
+                writer.writerow({'matrixBug': matrixBug[count_bug], 'matrixSource': matrixSource[ind], 'label': 1, 'Ri': ri,'Fi': fi})  # viết theo từng hàng
             if (type(data_file2[count]) == str):
                 r = gt.listFileInBug(data_file2[count], id[count])
                 r1 = []
@@ -78,8 +79,9 @@ def labelEqual1(bugVectors, sourceVectors):
                     fi_max = max(fi_max, fi)
                     ri_min = min(ri_min, ri)
                     fi_min = min(fi_min, fi)
-                    concate_vector = concatenate(bugVectors[count_bug], sourceVectors[ind])
-                    writer.writerow({'input_vector': concate_vector, 'label': 1, 'Ri': ri, 'Fi': fi})  # viết theo từng hàng
+                    # concate_vector = concatenate(bugVectors[count_bug], sourceVectors[ind])
+                    # writer.writerow({'input_vector': concate_vector, 'label': 1, 'Ri': ri, 'Fi': fi})  # viết theo từng hàng
+                    writer.writerow({'matrixBug':matrixBug[count_bug],'matrixSource':matrixSource[ind], 'label': 1, 'Ri': ri, 'Fi': fi})  # viết theo từng hàng
             count_bug =count_bug+1
             count = count+1
     return (ri_max, fi_max,ri_min, fi_min)
